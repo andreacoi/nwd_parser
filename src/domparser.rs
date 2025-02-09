@@ -126,3 +126,5 @@ pub fn extract_viewports(nodes: &[HtmlNode]) -> Vec<Viewport> {
 
     viewports
 }
+
+// TODO: INSERT COMMENTS FOR EACH AREA
