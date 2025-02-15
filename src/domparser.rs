@@ -2,6 +2,7 @@ use scraper::{Html, Selector};
 use std::fs;
 
 // declare a struct called Viewpoint, containing all the fields that must be mapped from HTML.
+#[derive(Debug)]
 pub struct Viewpoint {
     pub title: String,
     pub imgurl: String,
@@ -13,7 +14,7 @@ pub struct Viewpoint {
 // function to read HTML and transform in JSON
 // @args: file: String filename that must be in CWD.
 // @return Result<String>: generic that manage JSON
-pub fn read_html(file: String) -> () {
+pub fn read_html(file: String) -> Vec<Viewpoint> {
     let html_content: String = fs::read_to_string(&file)
         .expect("Invalid path or file not exists. Check your path and retry.\n");
     // Initialize all the selector we'll need on each iteration in the document file
@@ -27,10 +28,39 @@ pub fn read_html(file: String) -> () {
     // img selector - select the image of each viewpoint
     let img_selector: Selector = Selector::parse("img").unwrap();
     // comment selector - select all the comments of each viewpoint
-    let comment_selector: Selector = Selector::parse("div.comment").unwrap();
+    // TODO: to be used after
+    //let comment_selector: Selector = Selector::parse("div.comment").unwrap();
     // status selector - select the status of each viewpoint
-    let status: Selector = Selector::parse("span.namevaluepair").unwrap();
+    // TODO: to be used after
+    // let status_selector: Selector = Selector::parse("span.namevaluepair").unwrap();
     // coords CANNOT BE selected by selector because the coords aren't within an HTML TAG.
 
     // starting the parse
+    let viewpoints: Vec<Viewpoint> = document.select(&viewpoint_selector).map(|viewpoint| {
+        let title: String = viewpoint.select(&title_selector)
+                    .next()
+                    .map(|el| el.text().collect::<String>())
+                    .unwrap_or_default();
+        let imgurl: String = viewpoint.select(&img_selector).next()
+                    .and_then(|el| el.value().attr("href"))
+                    .unwrap_or("")
+                    .to_string();
+        let coords: String = viewpoint.text()
+                     .filter(|t| t.trim().chars().next().map(|c| c.is_numeric()).unwrap_or(false))
+                     .collect::<Vec<_>>()
+                     .join(", ")
+                     .trim()
+                     .to_string();
+        let comment:String = String::from("Comment di prova");
+        let status: String = String::from("Prova");
+
+        Viewpoint {
+            title,
+            imgurl,
+            coords,
+            comment,
+            status
+        }
+    }).collect();
+    viewpoints
 }
