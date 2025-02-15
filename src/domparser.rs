@@ -14,7 +14,7 @@ pub struct Viewpoint {
 // function to read HTML and transform in JSON
 // @args: file: String filename that must be in CWD.
 // @return Result<String>: generic that manage JSON
-pub fn read_html(file: String) -> Vec<Viewpoint> {
+pub fn parse_html(file: String) -> Vec<Viewpoint> {
     let html_content: String = fs::read_to_string(&file)
         .expect("Invalid path or file not exists. Check your path and retry.\n");
     // Initialize all the selector we'll need on each iteration in the document file
