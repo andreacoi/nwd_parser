@@ -32,7 +32,7 @@ pub fn read_html(file: String) -> Vec<Viewpoint> {
     //let comment_selector: Selector = Selector::parse("div.comment").unwrap();
     // status selector - select the status of each viewpoint
     // TODO: to be used after
-    // let status_selector: Selector = Selector::parse("span.namevaluepair").unwrap();
+    let status_selector: Selector = Selector::parse("span.namevaluepair > span.value").unwrap();
     // coords CANNOT BE selected by selector because the coords aren't within an HTML TAG.
 
     // starting the parse
@@ -42,7 +42,7 @@ pub fn read_html(file: String) -> Vec<Viewpoint> {
                     .map(|el| el.text().collect::<String>())
                     .unwrap_or_default();
         let imgurl: String = viewpoint.select(&img_selector).next()
-                    .and_then(|el| el.value().attr("href"))
+                    .and_then(|el| el.value().attr("src"))
                     .unwrap_or("")
                     .to_string();
         let coords: String = viewpoint.text()
@@ -51,8 +51,8 @@ pub fn read_html(file: String) -> Vec<Viewpoint> {
                      .join(", ")
                      .trim()
                      .to_string();
-        let comment:String = String::from("Comment di prova");
-        let status: String = String::from("Prova");
+        let status:String = viewpoint.select(&status_selector).next().map(|txt| txt.text().collect::<String>()).unwrap_or_default();
+        let comment: String = String::from("Prova");
 
         Viewpoint {
             title,
