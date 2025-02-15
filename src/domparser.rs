@@ -57,7 +57,10 @@ pub fn parse_html(file: String) -> Vec<Viewpoint> {
                      .collect::<Vec<_>>()
                      .join(", ")
                      .trim()
-                     .to_string();
+                     .to_string()
+                     .replace("\u{a0}", " ")
+                     .replace("\n", "")
+                     .replace("\t", "");
         // get a clean comment filtering status span and other DOM stuff
         let clean_comment: String = viewpoint.select(&comment_selector)
                         .next()
