@@ -5,4 +5,4 @@ edition = "2021"
 
 [dependencies]
 scraper = "0.22.0"
-genpdf = "0.2.0"
+printpdf = "0.5"
