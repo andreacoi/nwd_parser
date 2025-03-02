@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 scraper = "0.22.0"
+image = "0.24.3"
 printpdf = "0.5"
