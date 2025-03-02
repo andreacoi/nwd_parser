@@ -13,7 +13,7 @@ pub fn gen_nwdpdf() {
         printpdf::PdfDocumentReference,
         printpdf::PdfPageIndex,
         printpdf::PdfLayerIndex,
-    ) = PdfDocument::new("Font Variants Example", Mm(210.0), Mm(297.0), "layer 1");
+    ) = PdfDocument::new("test - TO BE CHANGED", Mm(210.0), Mm(297.0), "layer 1");
     // use doc.add_external_font to allocate stream in the heap - regular font - TODO: embed all others styles, to complete the entire family
     let font_regular = doc
         .add_external_font(&font_regular[..])
