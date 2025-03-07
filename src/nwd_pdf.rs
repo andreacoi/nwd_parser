@@ -5,19 +5,44 @@ use std::env;
 use std::fs::File;
 use std::io::BufWriter;
 
-pub fn gen_nwdpdf() {
+pub fn gen_nwdpdf(nwd_data: Vec<String>) -> () {
+    // create the document - blueprint
+    let (doc, page1, layer1): (
+            printpdf::PdfDocumentReference,
+            printpdf::PdfPageIndex,
+            printpdf::PdfLayerIndex,
+        ) = PdfDocument::new("test - TO BE CHANGED", Mm(210.0), Mm(297.0), "layer 1");
     // use include bytes to allocate a space in the heap in order to save the font on runtime, without recall it on the go.
     let font_regular = include_bytes!("../fonts/calibri-regular.ttf");
+    // add the italic style to the font family
+    let font_italic = include_bytes!("../fonts/calibri-italic.ttf");
+    // add the bold style to the font family
+    let font_bold = include_bytes!("../fonts/calibri-bold.ttf");
+    // add the bold italic style to the font family
+    let font_bold_italic = include_bytes!("../fonts/calibri-bold-italic.ttf");
+    // use doc.add_external_font to allocate stream in the heap - regular font - TODO: embed all others styles, to complete the entire family
+    let font_regular = doc
+        .add_external_font(&font_regular[..])
+        .expect("Failed to load Regular font");
+    // use doc.add_external_font to allocate stream in the heap - italic font
+    let font_italic = doc
+        .add_external_font(&font_italic[..])
+        .expect("Failed to load Italic font");
+    // use doc.add_external_font to allocate stream in the heap - bold font
+    let font_bold = doc
+        .add_external_font(&font_bold[..])
+        .expect("Failed to load Bold font");
+    // use doc.add_external_font to allocate stream in the heap - bold italic font
+    let font_bold_italic = doc
+        .add_external_font(&font_bold_italic[..])
+        .expect("Failed to load Bold Italic font");
+
     // create the document - blueprint
     let (doc, page1, layer1): (
         printpdf::PdfDocumentReference,
         printpdf::PdfPageIndex,
         printpdf::PdfLayerIndex,
     ) = PdfDocument::new("test - TO BE CHANGED", Mm(210.0), Mm(297.0), "layer 1");
-    // use doc.add_external_font to allocate stream in the heap - regular font - TODO: embed all others styles, to complete the entire family
-    let font_regular = doc
-        .add_external_font(&font_regular[..])
-        .expect("Failed to load Regular font");
     // initialize the current layer to have a place to write my content.
     let current_layer = doc.get_page(page1).get_layer(layer1);
     // insert a dummy text to test this function
