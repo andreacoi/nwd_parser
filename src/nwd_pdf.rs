@@ -4,14 +4,18 @@ use printpdf::{ColorBits, Image, ImageTransform, ImageXObject, Mm, PdfDocument, 
 use std::env;
 use std::fs::File;
 use std::io::BufWriter;
+use crate::domparser::Viewpoint;
 
-pub fn gen_nwdpdf(nwd_data: Vec<String>) -> () {
+// function to generate the pdf. Accepts as arguments the file title and the nwd_data
+// nwd_data is a vector of Viewpoint, which is a struct that contains the data of the viewpoint
+
+pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
     // create the document - blueprint
     let (doc, page1, layer1): (
             printpdf::PdfDocumentReference,
             printpdf::PdfPageIndex,
             printpdf::PdfLayerIndex,
-        ) = PdfDocument::new("test - TO BE CHANGED", Mm(210.0), Mm(297.0), "layer 1");
+        ) = PdfDocument::new(&file_title, Mm(210.0), Mm(297.0), "layer 1");
     // use include bytes to allocate a space in the heap in order to save the font on runtime, without recall it on the go.
     let font_regular = include_bytes!("../fonts/calibri-regular.ttf");
     // add the italic style to the font family
@@ -36,22 +40,16 @@ pub fn gen_nwdpdf(nwd_data: Vec<String>) -> () {
     let font_bold_italic = doc
         .add_external_font(&font_bold_italic[..])
         .expect("Failed to load Bold Italic font");
-
-    // create the document - blueprint
-    let (doc, page1, layer1): (
-        printpdf::PdfDocumentReference,
-        printpdf::PdfPageIndex,
-        printpdf::PdfLayerIndex,
-    ) = PdfDocument::new("test - TO BE CHANGED", Mm(210.0), Mm(297.0), "layer 1");
-    // initialize the current layer to have a place to write my content.
-    let current_layer = doc.get_page(page1).get_layer(layer1);
-    // insert a dummy text to test this function
-    current_layer.use_text("This is Regular", 12.0, Mm(10.0), Mm(280.0), &font_regular);
-    // create the cwd path in order to get the images from this directory
+    // get the current working directory
     let current_working_dir =
         env::current_dir().expect("Unable to retrieve current working directory.");
-    // set the image path joining the cwd path with an hardcoded name of the file.
-    // todo: set filename dinamically
+    // iterate over the nwd_data vector
+    for (index, viewpoint) in nwd_data.iter().enumerate() {
+        let (page, layer) = doc.add_page(Mm(210.0), Mm(297.0),&format!("layer {}", index + 1));
+        let current_layer = doc.get_page(page).get_layer(layer);
+        // insert here the title of the issue - the title is the name of the viewpoint
+        current_layer.use_text("ISSUE TITLE", 22.0, Mm(10.0), Mm(280.0), &font_bold);
+        // get the image filename - to be joined with the current working directory
     let image_path = current_working_dir.join("vp0001.jpg");
     // load the image using the crate image
     let img = ImageReader::open(image_path)
@@ -94,11 +92,20 @@ pub fn gen_nwdpdf(nwd_data: Vec<String>) -> () {
             dpi: None,
         },
     );
+    // create the status layer - useful to set here the status of the issue - Open, Closed, In Progress, etc.
+    let status_layer = doc.get_page(page).add_layer("status_layer");
+    // set the status of the issue - get it from the viewpoint
+    status_layer.use_text("Status: SET THE STATUS OF THE ISSUE DINAMICALLY HERE", 16.0, Mm(10.0), Mm(73.0), &font_bold);
+    // create the comment layer - the comment is the description of the issue and explains why the issue is open, closed, etc.
+    let comment_layer = doc.get_page(page).add_layer("comment_layer");
+    // set the comment of the issue - get it from the viewpoint
+    comment_layer.use_text("ISSUE COMMENT DINAMICALLY HERE", 16.0, Mm(10.0), Mm(53.0), &font_regular);
+    }
+    
     // create the real file in the runtime path - not using folders and complex paths
-    let file = File::create("font_variants_example.pdf").expect("failed to create file");
+    let file = File::create(format!("{}.pdf", &file_title)).expect("failed to create file");
     // create bufwriter, doc.save accepts as argument only bufwriter<file>
     let mut writer = BufWriter::new(file);
     // save pdf in the created file
     doc.save(&mut writer).expect("failed to save pdf");
-    // todo: manage images
 }
