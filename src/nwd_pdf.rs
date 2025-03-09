@@ -25,7 +25,7 @@ pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
         .add_external_font(&font_regular[..])
         .expect("Failed to load Regular font");
     // use doc.add_external_font to allocate stream in the heap - italic font
-    let font_italic = doc
+    let _font_italic = doc
         .add_external_font(&font_italic[..])
         .expect("Failed to load Italic font");
     // use doc.add_external_font to allocate stream in the heap - bold font
@@ -44,9 +44,9 @@ pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
         let (page, layer) = doc.add_page(Mm(210.0), Mm(297.0),&format!("layer {}", index + 1));
         let current_layer = doc.get_page(page).get_layer(layer);
         // insert here the title of the issue - the title is the name of the viewpoint
-        current_layer.use_text("ISSUE TITLE", 22.0, Mm(10.0), Mm(280.0), &font_bold);
+        current_layer.use_text(&viewpoint.title, 22.0, Mm(10.0), Mm(280.0), &font_bold);
         // get the image filename - to be joined with the current working directory
-    let image_path = current_working_dir.join("vp0001.jpg");
+    let image_path = current_working_dir.join(&viewpoint.imgurl);
     // load the image using the crate image
     let img = ImageReader::open(image_path)
         .expect("Failed to open image")
@@ -91,11 +91,15 @@ pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
     // create the status layer - useful to set here the status of the issue - Open, Closed, In Progress, etc.
     let status_layer = doc.get_page(page).add_layer("status_layer");
     // set the status of the issue - get it from the viewpoint
-    status_layer.use_text("Status: SET THE STATUS OF THE ISSUE DINAMICALLY HERE", 16.0, Mm(10.0), Mm(73.0), &font_bold);
+    status_layer.use_text(format!("Status: {}", &viewpoint.status), 16.0, Mm(10.0), Mm(73.0), &font_bold);
+    // create the coords layer - useful to set here the coordinates of the issue
+    let coords_layer = doc.get_page(page).add_layer("coords_layer");
+    // set the coordinates of the issue - get it from the viewpoint
+    coords_layer.use_text(format!("Coords: {}", &viewpoint.coords), 12.0, Mm(10.0), Mm(65.0), &font_bold_italic);
     // create the comment layer - the comment is the description of the issue and explains why the issue is open, closed, etc.
     let comment_layer = doc.get_page(page).add_layer("comment_layer");
     // set the comment of the issue - get it from the viewpoint
-    comment_layer.use_text("ISSUE COMMENT DINAMICALLY HERE", 16.0, Mm(10.0), Mm(53.0), &font_regular);
+    comment_layer.use_text(&viewpoint.comment, 14.0, Mm(10.0), Mm(53.0), &font_regular);
     }
     
     // create the real file in the runtime path - not using folders and complex paths
