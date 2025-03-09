@@ -5,6 +5,7 @@ use std::env;
 use std::fs::File;
 use std::io::BufWriter;
 use crate::domparser::Viewpoint;
+use textwrap::wrap;
 
 // function to generate the pdf. Accepts as arguments the file title and the nwd_data
 // nwd_data is a vector of Viewpoint, which is a struct that contains the data of the viewpoint
@@ -99,7 +100,14 @@ pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
     // create the comment layer - the comment is the description of the issue and explains why the issue is open, closed, etc.
     let comment_layer = doc.get_page(page).add_layer("comment_layer");
     // set the comment of the issue - get it from the viewpoint
-    comment_layer.use_text(&viewpoint.comment, 14.0, Mm(10.0), Mm(53.0), &font_regular);
+    // wrap the comment text
+    let wrapped_comment = wrap(&viewpoint.comment, 90);
+    let mut y_position = 53.0; // starting y position for the comment text
+    for line in wrapped_comment {
+        comment_layer.use_text(line, 14.0, Mm(10.0), Mm(y_position), &font_regular);
+        y_position -= 5.0; // adjust the line spacing as needed
+    }
+
     }
     
     // create the real file in the runtime path - not using folders and complex paths
