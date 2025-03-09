@@ -89,14 +89,18 @@ pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
             dpi: None,
         },
     );
-    // create the status layer - useful to set here the status of the issue - Open, Closed, In Progress, etc.
+    /* // create the status layer - useful to set here the status of the issue - Open, Closed, In Progress, etc.
     let status_layer = doc.get_page(page).add_layer("status_layer");
     // set the status of the issue - get it from the viewpoint
-    status_layer.use_text(format!("Status: {}", &viewpoint.status), 16.0, Mm(10.0), Mm(73.0), &font_bold);
+    status_layer.use_text(format!("Status: {}", &viewpoint.status), 16.0, Mm(10.0), Mm(73.0), &font_bold); */
     // create the coords layer - useful to set here the coordinates of the issue
     let coords_layer = doc.get_page(page).add_layer("coords_layer");
     // set the coordinates of the issue - get it from the viewpoint
     coords_layer.use_text(format!("Coords: {}", &viewpoint.coords), 12.0, Mm(10.0), Mm(65.0), &font_bold_italic);
+    // create the comment header layer - the comment header is the title of the comment
+    let comment_header_layer = doc.get_page(page).add_layer("comment_header_layer");
+    // set the comment header of the issue - hardcoded field
+    comment_header_layer.use_text("Issue details:", 14.0, Mm(10.0), Mm(58.0), &font_bold_italic);
     // create the comment layer - the comment is the description of the issue and explains why the issue is open, closed, etc.
     let comment_layer = doc.get_page(page).add_layer("comment_layer");
     // set the comment of the issue - get it from the viewpoint
