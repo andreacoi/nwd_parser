@@ -10,12 +10,8 @@ use crate::domparser::Viewpoint;
 // nwd_data is a vector of Viewpoint, which is a struct that contains the data of the viewpoint
 
 pub fn gen_nwdpdf(file_title: String, nwd_data: Vec<Viewpoint>) -> () {
-    // create the document - blueprint
-    let (doc, page1, layer1): (
-            printpdf::PdfDocumentReference,
-            printpdf::PdfPageIndex,
-            printpdf::PdfLayerIndex,
-        ) = PdfDocument::new(&file_title, Mm(210.0), Mm(297.0), "layer 1");
+    // create the empty document
+    let doc = PdfDocument::empty(&file_title);
     // use include bytes to allocate a space in the heap in order to save the font on runtime, without recall it on the go.
     let font_regular = include_bytes!("../fonts/calibri-regular.ttf");
     // add the italic style to the font family
